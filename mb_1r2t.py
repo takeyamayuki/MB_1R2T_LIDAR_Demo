@@ -16,7 +16,7 @@ screen = pygame.display.set_mode((800, 800))
 clock = pygame.time.Clock()
 screen.fill((0, 0, 0))
 
-com = serial.Serial(port='COM13', 
+com = serial.Serial(port='/dev/ttyUSB0', 
                             baudrate=158700, 
                             parity=serial.PARITY_NONE, 
                             stopbits=serial.STOPBITS_ONE, 
