@@ -2,12 +2,14 @@ import serial
 import pygame
 import math
 from enum import Enum
- 
+
+
 class State(Enum):
     SYNC0 = 0
     SYNC1 = 1
     HEADER = 2
     DATA = 3
+
 
 pygame.init()
 pygame.display.set_caption('LIDAR Demo')
@@ -16,13 +18,13 @@ screen = pygame.display.set_mode((800, 800))
 clock = pygame.time.Clock()
 screen.fill((0, 0, 0))
 
-com = serial.Serial(port='/dev/ttyUSB0', 
-                            baudrate=158700, 
-                            parity=serial.PARITY_NONE, 
-                            stopbits=serial.STOPBITS_ONE, 
-                            bytesize=serial.EIGHTBITS, 
-                            timeout=None)
- 
+com = serial.Serial(port='/dev/ttyUSB0',
+                    baudrate=158700,
+                    parity=serial.PARITY_NONE,
+                    stopbits=serial.STOPBITS_ONE,
+                    bytesize=serial.EIGHTBITS,
+                    timeout=None)
+
 state = State.SYNC0
 package_type = 0
 package_size = 0
@@ -66,7 +68,7 @@ while running:
             package_type = header[0]
             package_size = header[1]
             package_start = (header[3] << 8) | header[2]
-            package_stop  = (header[5] << 8) | header[4]
+            package_stop = (header[5] << 8) | header[4]
 
             state = State.DATA
 
@@ -81,7 +83,7 @@ while running:
             state = State.SYNC0
             continue
 
-        if package_type & 0x01: # Bad Package
+        if package_type & 0x01:  # Bad Package
             state = State.SYNC0
             continue
 
@@ -103,13 +105,14 @@ while running:
             angle = (package_start + step * i) % 0xB400
             anglef = (angle / 0xB400) * (math.pi * 2)
 
-            if anglef < last_angle: # New Frame
+            if anglef < last_angle:  # New Frame
                 pygame.display.flip()
                 clock.tick()
                 screen.fill((0, 0, 0))
-                fps = font.render(str(int(clock.get_fps()))+' fps', True, pygame.Color('white'))
+                fps = font.render(str(int(clock.get_fps())) +
+                                  ' fps', True, pygame.Color('white'))
                 screen.blit(fps, (20, 20))
-            
+
             last_angle = anglef
 
             anglef = math.pi*2 - anglef
@@ -118,7 +121,8 @@ while running:
             y = math.sin(anglef) * distancef * (-1) + 400
 
             if distance < 64840:
-                screen.set_at((int(x),int(y)), (intensity,255-intensity,intensity))
+                screen.set_at((int(x), int(y)),
+                              (intensity, 255-intensity, intensity))
 
         state = State.SYNC0
 
